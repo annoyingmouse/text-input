@@ -26,6 +26,10 @@
   --input-border: var(--rem-twentieth);
   --input-height: calc(var(--input-text-size) + calc(var(--input-border) + calc(var(--input-padding) * 2)));
 }
+:host span {
+  display: none;
+  border: none;
+}
 
 :host([invalid]) label {
   color: var(--TorchRed);
@@ -35,6 +39,10 @@
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
   border-color: var(--TorchRed);
+}
+:host([invalid]) span {
+  display: unset;
+  border: unset;
 }
 
 div {
@@ -109,10 +117,6 @@ span {
   color: var(--white);
   border: var(--VeryPaleRed);
   padding: 0 var(--rem-quarter) var(--rem-eighth) var(--rem-quarter);
-}
-span.hidden {
-  display: none;
-  border: none;
 }
 
 /*# sourceMappingURL=text-input.css.map */

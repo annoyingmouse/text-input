@@ -26,6 +26,10 @@
   --input-padding: var(--rem-eigth-tenths);
   --input-border: var(--rem-twentieth);
   --input-height: calc(var(--input-text-size) + calc(var(--input-border) + calc(var(--input-padding) * 2)));
+  span {
+    display: none;
+    border: none;
+  }
 }
 
 :host([invalid]){
@@ -37,6 +41,10 @@
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
     border-color: var(--TorchRed);
+  }
+  span {
+    display: unset;
+    border: unset;
   }
 }
 
@@ -114,8 +122,4 @@ span {
   color: var(--white);
   border: var(--VeryPaleRed);
   padding: 0 var(--rem-quarter) var(--rem-eighth) var(--rem-quarter);
-  &.hidden {
-    display: none;
-    border: none;
-  }
 }

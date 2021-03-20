@@ -30,6 +30,10 @@
   --input-border: var(--rem-twentieth);
   --input-height: calc(var(--input-text-size) + calc(var(--input-border) + calc(var(--input-padding) * 2)));
 }
+:host span {
+  display: none;
+  border: none;
+}
 
 :host([invalid]) label {
   color: var(--TorchRed);
@@ -39,6 +43,10 @@
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
   border-color: var(--TorchRed);
+}
+:host([invalid]) span {
+  display: unset;
+  border: unset;
 }
 
 div {
@@ -114,18 +122,13 @@ span {
   border: var(--VeryPaleRed);
   padding: 0 var(--rem-quarter) var(--rem-eighth) var(--rem-quarter);
 }
-span.hidden {
-  display: none;
-  border: none;
-}
 
 /*# sourceMappingURL=text-input.css.map */
-
     </style>
     <div>
       <input type="text">
       <label></label>
-      <span class="hidden"></span>
+      <span></span>
     </div>
   `
   /**
@@ -208,9 +211,6 @@ span.hidden {
           this.span.innerText = `The ${this.lowercaseName(this.placeholder)} field is required.`
           this.name = this.placeholder
         }.bind(this),
-        invalid: function() {
-          this.handleInvalidState(newValue)
-        }.bind(this)
       }
       oldValue !== newValue && attributeHandler?.[name]()
     }
@@ -242,13 +242,6 @@ span.hidden {
         this.safeSetAttribute('invalid', '')
       } else {
         this.removeAttribute('invalid')
-      }
-    }
-    handleInvalidState(value) {
-      if (value !== null) {
-        this.span.classList.remove('hidden')
-      } else {
-        this.span.classList.add('hidden')
       }
     }
   }
