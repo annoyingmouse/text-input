@@ -1,129 +1,14 @@
 (() => {
   const template = document.createElement('template')
+  /*
+   * Paths for CSS imports are a pain - this assumes that the css is in the same folder as the component
+   * It'll allow us to use a File Watcher to transpile SCSS into CSS and include it in our component.
+   * Reference: https://www.lifewire.com/difference-between-important-and-link-3466404
+   */
+  const compPath = document.currentScript.getAttribute('src').split('.').slice(0, -1).join('.')
   template.innerHTML = `
     <style>
-:host {
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji, cursive;
-  --Gray50: #7f7f7f;
-  --Gray75: #bfbfbf;
-  --Gray90: #e5e5e5;
-  --white: #ffffff;
-  --TorchRed: #ff0033;
-  --VeryPaleRed: #eba19e;
-  --rem-twentieth: 0.05rem;
-  --rem-eighth: 0.125rem;
-  --rem-quarter: 0.25rem;
-  --rem-half: 0.5rem;
-  --rem-six-tenths: 0.6rem;
-  --rem-seven-tenths: 0.7rem;
-  --rem-three-quarters: 0.75rem;
-  --rem-eigth-tenths: 0.8rem;
-  --rem: 1rem;
-  --rem-and-a-half: 1.5rem;
-  --rem-and-three-quarters: 1.75rem;
-  --rem-three: 3rem;
-  --s-fifth: 0.2s;
-  --op-nine-tenths: 0.9;
-  --op-sixth-tenths: 0.6;
-  --input-text-size: var(--rem-and-a-half);
-  --input-padding: var(--rem-eigth-tenths);
-  --input-border: var(--rem-twentieth);
-  --input-height: calc(var(--input-text-size) + calc(var(--input-border) + calc(var(--input-padding) * 2)));
-}
-:host span {
-  display: none;
-  border: none;
-}
-
-:host([invalid]) label {
-  color: var(--TorchRed);
-  opacity: 1;
-}
-:host([invalid]) input {
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
-  border-color: var(--TorchRed);
-}
-:host([invalid]) span {
-  display: unset;
-  border: unset;
-}
-
-div {
-  position: relative;
-  margin-top: var(--rem);
-  margin-bottom: var(--rem-and-a-half);
-}
-
-input {
-  box-sizing: border-box;
-  border: var(--input-border) solid var(--Gray90);
-  border-radius: var(--rem-eighth);
-  width: 100%;
-  transition: border var(--s-fifth) linear, background-color var(--s-fifth) linear;
-  display: inline-block;
-  padding: var(--input-padding);
-  line-height: var(--input-text-size);
-  margin-bottom: var(--rem-three-quarters);
-}
-input:focus + label, input:not(:placeholder-shown) + label {
-  top: calc(var(--rem-six-tenths) * -1);
-  left: var(--rem-eighth);
-  background-color: var(--white);
-  font-size: var(--rem-eigth-tenths);
-  padding: 0 var(--rem) 0 var(--rem-half);
-  border-radius: var(--rem);
-}
-input:focus {
-  outline: none;
-  box-shadow: 0 0 var(--rem-eighth) var(--rem-twentieth) rgba(0, 0, 0, 0.1);
-  border-color: var(--Gray75);
-}
-input:hover {
-  border-color: var(--Gray75);
-}
-input::-webkit-input-placeholder {
-  color: transparent;
-}
-input::-moz-placeholder {
-  color: transparent;
-}
-input:-ms-input-placeholder {
-  color: transparent;
-}
-input:-moz-placeholder {
-  color: transparent;
-}
-input::placeholder {
-  color: transparent;
-}
-
-label {
-  position: absolute;
-  top: var(--rem-three-quarters);
-  left: var(--rem);
-  color: var(--Gray50);
-  transition: all var(--s-fifth) ease-in;
-  pointer-events: none;
-}
-label:hover {
-  cursor: auto;
-}
-
-span {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: var(--input-height);
-  opacity: 1;
-  pointer-events: none;
-  background-color: var(--TorchRed);
-  color: var(--white);
-  border: var(--VeryPaleRed);
-  padding: 0 var(--rem-quarter) var(--rem-eighth) var(--rem-quarter);
-}
-
-/*# sourceMappingURL=text-input.css.map */
+      @import "${compPath}.css";
     </style>
     <div>
       <input type="text">
@@ -132,7 +17,7 @@ span {
     </div>
   `
   /**
-   * @customelement input-element
+   * @customElement input-text
    *
    * @description This wraps a text input, a label and a span with a div element. The span acts as the
    * warning should there be an issue with the value
@@ -170,7 +55,6 @@ span {
       this.label = this.shadow.querySelector('label')
       this.input = this.shadow.querySelector('input')
       this.span = this.shadow.querySelector('span')
-      this.name = null
     }
     connectedCallback() {
       if (this.input.isConnected) {
@@ -191,28 +75,34 @@ span {
         })
       }
     }
-    // https://stackoverflow.com/questions/7627000/javascript-convert-string-to-safe-class-name-for-css#7627141
+    /*
+     * We want to have a safe name for the labels 'for' and the inputs 'id' attributes, we have the name, so it makes
+     * sense to sanitise it for these attribute values. I "borrowed" a single line function from StackOverflow:
+     * https://stackoverflow.com/questions/7627000/javascript-convert-string-to-safe-class-name-for-css#7627141
+     */
     sanitiseName = value => value.replace(/[\s!"#$%&'()*+,./:;<=>?@[\\\]^`{|}~]/g, '').toLowerCase()
     lowercaseName = value => `${value[0].toLowerCase()}${value.slice(1)}`
     attributeChangedCallback(name, oldValue, newValue) {
       const attributeHandler = {
-        autocomplete: function() {
-          this.input.setAttribute('autocomplete', this.getAttribute('autocomplete'))
-        }.bind(this),
-        value: function() {
-          this.input.value = this.value
-        }.bind(this),
-        placeholder: function() {
-          this.input.setAttribute('placeholder', this.placeholder)
-          this.input.id = this.sanitiseName(this.placeholder)
-          this.label.setAttribute('for', this.sanitiseName(this.placeholder))
-          this.label.innerText = this.placeholder + (this.hasAttribute('required')
-              ? '' : ' (Optional)')
-          this.span.innerText = `The ${this.lowercaseName(this.placeholder)} field is required.`
-          this.name = this.placeholder
-        }.bind(this),
+        autocomplete: function(comp) {
+          comp.input.setAttribute('autocomplete', comp.getAttribute('autocomplete'))
+        },
+        value: function(comp) {
+          comp.input.value = comp.value
+        },
+        placeholder: function(comp) {
+          comp.input.setAttribute('placeholder', comp.placeholder)
+          comp.input.id = comp.sanitiseName(comp.placeholder)
+          comp.label.setAttribute('for', comp.sanitiseName(comp.placeholder))
+          comp.label.innerText = comp.placeholder + (comp.hasAttribute('required')
+              ? ''
+              : ' (Optional)')
+          comp.span.innerText = `The ${comp.lowercaseName(comp.placeholder)} field is required.`
+        }
       }
-      oldValue !== newValue && attributeHandler?.[name]()
+      if((oldValue !== newValue) && attributeHandler.hasOwnProperty(name)){
+        attributeHandler?.[name](this)
+      }
     }
     /**
      * Guards against loops when reflecting observed attributes.
