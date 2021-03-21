@@ -57,6 +57,8 @@
       this.label = this.shadow.querySelector('label')
       this.input = this.shadow.querySelector('input')
       this.span = this.shadow.querySelector('span')
+      this.sanitiseName = value => value.replace(/[\s!"#$%&'()*+,./:;<=>?@[\\\]^`{|}~]/g, '').toLowerCase()
+      this.lowercaseName = value => `${value[0].toLowerCase()}${value.slice(1)}`
     }
     connectedCallback() {
       if (this.input.isConnected) {
@@ -82,8 +84,6 @@
      * sense to sanitise it for these attribute values. I "borrowed" a single line function from StackOverflow:
      * https://stackoverflow.com/questions/7627000/javascript-convert-string-to-safe-class-name-for-css#7627141
      */
-    sanitiseName = value => value.replace(/[\s!"#$%&'()*+,./:;<=>?@[\\\]^`{|}~]/g, '').toLowerCase()
-    lowercaseName = value => `${value[0].toLowerCase()}${value.slice(1)}`
     attributeChangedCallback(name, oldValue, newValue) {
       const attributeHandler = {
         autocomplete: function(comp) {
@@ -130,7 +130,7 @@
       return this.hasAttribute('invalid')
     }
     set invalid(value) {
-      if (!!value) {
+      if (value) {
         this.safeSetAttribute('invalid', '')
       } else {
         this.removeAttribute('invalid')
