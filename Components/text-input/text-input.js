@@ -21,20 +21,23 @@
   /**
    * @customElement input-text
    *
-   * @description This wraps a text input, a label and a span with a div element. The span acts as the
-   * warning should there be an issue with the value
+   * @description This wraps a text input, a label and a span with a div element. The span acts as the warning should
+   * there be an issue with the value
    *
    * @property value {string} the value contained within the text input, updated by input.
    *
-   * @property placeholder {string} both the label and invisible placeholder and becomes
-   * the "safe" `id` of the input and the value of the `for` of the label
+   * @property placeholder {string} both the label and invisible placeholder and becomes the "safe" `id` of the input
+   * and the value of the `for` of the label
    *
-   * @property required {boolean} indicates whether an empty value is acceptable, or will trigger the
-   * warning
+   * @property required {boolean} indicates whether an empty value is acceptable, or will trigger the warning. I think
+   * this counts as a Boolean but in reality - if it the attribute exists then validation will occur.
    *
-   * @property autocomplete {string}
+   * @property autocomplete {string} this will only work if the input is within a form which has a submit button.
+   * There is a list of values here: https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/autocomplete and
+   * more details here: https://developers.google.com/web/updates/2015/06/checkout-faster-with-autofill
    *
    * @example <caption>Ask a user for their first name</caption>
+   *
    * <input-text placeholder="First name"
    *             value="Dominic"
    *             required></input-text>
@@ -57,8 +60,13 @@
       this.label = this.shadow.querySelector('label')
       this.input = this.shadow.querySelector('input')
       this.span = this.shadow.querySelector('span')
-      this.sanitiseName = value => value.replace(/[\s!"#$%&'()*+,./:;<=>?@[\\\]^`{|}~]/g, '').toLowerCase()
       this.lowercaseName = value => `${value[0].toLowerCase()}${value.slice(1)}`
+      /*
+       * We want to have a safe name for the labels 'for' and the inputs 'id' attributes, we have the name, so it makes
+       * sense to sanitise it for these attribute values. I "borrowed" a single line function from StackOverflow:
+       * https://stackoverflow.com/questions/7627000/javascript-convert-string-to-safe-class-name-for-css#7627141
+       */
+      this.sanitiseName = value => value.replace(/[\s!"#$%&'()*+,./:;<=>?@[\\\]^`{|}~]/g, '').toLowerCase()
     }
     connectedCallback() {
       if (this.input.isConnected) {
@@ -79,11 +87,6 @@
         })
       }
     }
-    /*
-     * We want to have a safe name for the labels 'for' and the inputs 'id' attributes, we have the name, so it makes
-     * sense to sanitise it for these attribute values. I "borrowed" a single line function from StackOverflow:
-     * https://stackoverflow.com/questions/7627000/javascript-convert-string-to-safe-class-name-for-css#7627141
-     */
     attributeChangedCallback(name, oldValue, newValue) {
       const attributeHandler = {
         autocomplete: function(comp) {
