@@ -5,13 +5,14 @@
  */
 
 (() => {
+    import { zxcvbn } from './zxcvbn.js'
     const template = document.createElement('template')
     /*
-     * Paths for CSS imports are a pain - this assumes that the css is in the same folder as the component
-     * It'll allow us to use a File Watcher to transpile SCSS into CSS and include it in our component.
+     * Paths for CSS imports are a pain - this assumes that the css is in the same folder as the component. It'll allow
+     * us to use a File Watcher to transpile SCSS into CSS and include it in our component.
      * Reference: https://www.lifewire.com/difference-between-important-and-link-3466404
-     * NOTE: This does mean that both the component script and the CSS should reside in the same folder and
-     * should have the same name!
+     * NOTE: This does mean that both the component script and the CSS should reside in the same folder and should have
+     * the same name!
      */
     const compPath = document.currentScript.getAttribute('src').split('.').slice(0, -1).join('.')
     template.innerHTML = `
