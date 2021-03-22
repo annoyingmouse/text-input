@@ -1,3 +1,9 @@
+/*
+ * References:
+ * https://cssgradient.io/
+ * https://stackoverflow.com/questions/23751274/can-we-set-a-gradient-color-to-border-bottom-property
+ */
+
 (() => {
     const template = document.createElement('template')
     /*
