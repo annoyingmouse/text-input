@@ -20,7 +20,7 @@
       @import "${compPath}.css";
     </style>
     <div>
-      <input type="password">
+      <input type="password" autocomplete="current-password">
       <label></label>
       <span></span>
     </div>
@@ -106,13 +106,20 @@
                     comp.input.value = comp.value
                 },
                 placeholder: function(comp) {
-                    comp.input.setAttribute('placeholder', comp.placeholder)
+                    comp.input.safeSetAttribute('placeholder', comp.placeholder)
                     comp.input.id = comp.sanitiseName(comp.placeholder)
-                    comp.label.setAttribute('for', comp.sanitiseName(comp.placeholder))
+                    comp.label.safeSetAttribute('for', comp.sanitiseName(comp.placeholder))
                     comp.label.innerText = comp.placeholder + (comp.hasAttribute('required')
                         ? ''
                         : ' (Optional)')
                     comp.span.innerText = `The ${comp.lowercaseName(comp.placeholder)} field is required.`
+                },
+                check: function(comp) {
+                    if(this.autocomplete){
+                        comp.input.safeSetAttribute('autocomplete', comp.getAttribute('autocomplete'))
+                    }else{
+                        comp.input.safeSetAttribute('autocomplete', 'new-password')
+                    }
                 }
             }
             if((oldValue !== newValue)){
@@ -138,6 +145,9 @@
         }
         set value(value) {
             this.safeSetAttribute('value', value)
+        }
+        get autocomplete() {
+            return this.getAttribute('check')
         }
         get invalid() {
             return this.hasAttribute('invalid')
