@@ -42,7 +42,7 @@
    *             value="Dominic"
    *             required></input-text>
    */
-  class InputText extends HTMLElement {
+  class TextInput extends HTMLElement {
     static get observedAttributes() {
       return [
         'value',
@@ -140,5 +140,5 @@
       }
     }
   }
-  window.customElements.define('input-text', InputText)
+  window.customElements.define('test-input', TextInput)
 })()
