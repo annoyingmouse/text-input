@@ -7,14 +7,16 @@
     <script type="module" src="Components/password-input/password-input.js"></script>
   </head>
   <body>
-    <input-text placeholder="First name"
+    <text-input placeholder="First name"
                 autocomplete="given-name"
-                value="Dominic"></input-text>
-    <input-text placeholder="Last name"
+                value="Dominic"></text-input>
+    <text-input placeholder="Last name"
                 autocomplete="family-name"
-                required></input-text>
-    <input-password placeholder="Last name"
-                    autocomplete="family-name"
-                    check></input-password>
+                required></text-input>
+    <password-input placeholder="New password"
+                    required
+                    check></password-input>
+    <password-input placeholder="repeat new password"
+                    required></password-input>
   </body>
 </html>
