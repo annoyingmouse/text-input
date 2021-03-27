@@ -102,7 +102,7 @@
           comp.label.innerText = comp.placeholder + (comp.hasAttribute('required')
               ? ''
               : ' (Optional)')
-          comp.span.innerText = `The ${comp.lowercaseName(comp.placeholder)} field is required.`
+          comp.span.innerText = `The field '${comp.lowercaseName(comp.placeholder)}' is required.`
         }
       }
       if((oldValue !== newValue)){
@@ -140,5 +140,5 @@
       }
     }
   }
-  window.customElements.define('test-input', TextInput)
+  window.customElements.define('text-input', TextInput)
 })()
