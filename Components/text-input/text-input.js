@@ -18,6 +18,13 @@
       <span></span>
     </div>
   `
+  /*
+   * We want to have a safe name for the labels 'for' and the inputs 'id' attributes, we have the name, so it makes
+   * sense to sanitise it for these attribute values. I "borrowed" a single line function from StackOverflow:
+   * https://stackoverflow.com/questions/7627000/javascript-convert-string-to-safe-class-name-for-css#7627141
+   */
+  const sanitiseName = value => value.replace(/[\s!"#$%&'()*+,./:;<=>?@[\\\]^`{|}~]/g, '').toLowerCase()
+
   /**
    * @customElement input-text
    *
@@ -60,13 +67,6 @@
       this.label = this.shadow.querySelector('label')
       this.input = this.shadow.querySelector('input')
       this.span = this.shadow.querySelector('span')
-      this.lowercaseName = value => `${value[0].toLowerCase()}${value.slice(1)}`
-      /*
-       * We want to have a safe name for the labels 'for' and the inputs 'id' attributes, we have the name, so it makes
-       * sense to sanitise it for these attribute values. I "borrowed" a single line function from StackOverflow:
-       * https://stackoverflow.com/questions/7627000/javascript-convert-string-to-safe-class-name-for-css#7627141
-       */
-      this.sanitiseName = value => value.replace(/[\s!"#$%&'()*+,./:;<=>?@[\\\]^`{|}~]/g, '').toLowerCase()
     }
     connectedCallback() {
       if (this.input.isConnected) {
@@ -97,12 +97,12 @@
         },
         placeholder: function(comp) {
           comp.input.setAttribute('placeholder', comp.placeholder)
-          comp.input.id = comp.sanitiseName(comp.placeholder)
-          comp.label.setAttribute('for', comp.sanitiseName(comp.placeholder))
+          comp.input.id = sanitiseName(comp.placeholder)
+          comp.label.setAttribute('for', sanitiseName(comp.placeholder))
           comp.label.innerText = comp.placeholder + (comp.hasAttribute('required')
               ? ''
               : ' (Optional)')
-          comp.span.innerText = `The field '${comp.lowercaseName(comp.placeholder)}' is required.`
+          comp.span.innerText = `The field '${comp.placeholder}' is required.`
         }
       }
       if((oldValue !== newValue)){

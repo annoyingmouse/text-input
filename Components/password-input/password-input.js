@@ -27,15 +27,14 @@
     const arr = []
     if(result.feedback.warning) {
       const warning = document.createElement('strong')
-      warning.appendChild(document.createTextNode(result.feedback.warning))
+      warning.appendChild(document.createTextNode(result.feedback.warning.replace(/([^.])$/, '$1.')))
       arr.push(warning)
     }
     if(result.feedback.suggestions.length){
-      arr.push(document.createTextNode(result.feedback.suggestions.join(' ')))
+      arr.push(document.createTextNode(result.feedback.suggestions.map(i => i.replace(/([^.])$/, '$1.')).join(' ')))
     }
     return arr
   }
-  const lowercaseName = value => `${value[0].toLowerCase()}${value.slice(1)}`
   const sanitiseName = value => value.replace(/[\s!"#$%&'()*+,./:;<=>?@[\\\]^`{|}~]/g, '').toLowerCase()
 
   /**
@@ -68,7 +67,8 @@
         'value',
         'placeholder',
         'autocomplete',
-        'check'
+        'check',
+        'replicates'
       ]
     }
     constructor() {
@@ -80,17 +80,38 @@
       this.label = this.shadow.querySelector('label')
       this.input = this.shadow.querySelector('input')
       this.span = this.shadow.querySelector('span')
+      this.inputEvent = new CustomEvent("input", {
+        bubbles: true,
+        cancelable: false,
+        composed: true
+      })
     }
     connectedCallback() {
       if (this.input.isConnected) {
+        if(this.original){
+          this.original.addEventListener('input', event => {
+            if(this.value && (this.value !== event.target.value)){
+              this.invalid = true
+              this.span.innerText = `The field '${this.placeholder}' does not match the '${this.original.getAttribute('placeholder')}' field.`
+            }else{
+              this.invalid = false
+            }
+          })
+        }
         this.input.addEventListener('blur', event => {
           if (!event.target.value && this.hasAttribute('required')) {
             this.invalid = true
-            this.span.innerText = `The field '${lowercaseName(this.placeholder)}' is required.`
+            this.span.innerText = `The field '${this.placeholder}' is required.`
             this.removeAttribute('strength')
-          } else {
+          } else if(this.hasAttribute('replicates')) {
+            if(this.original.value !== event.target.value){
+              this.invalid = true
+              this.span.innerText = `The field '${this.placeholder}' does not match the '${this.original.getAttribute('placeholder')}' field.`
+            }else{
+              this.invalid = false
+            }
+          } else{
             this.invalid = false
-            this.value = event.target.value
           }
         })
         this.input.addEventListener('input', event => {
@@ -98,10 +119,8 @@
           if (event.target.value && this.hasAttribute('required')) {
             this.invalid = false
           }
-
           if(this.hasAttribute('check')) {
             const result = zxcvbn(event.target.value)
-            console.log(result)
             this.strength = result.score
             if(result.feedback.suggestions){
               this.span.innerText = ''
@@ -130,7 +149,7 @@
           comp.label.innerText = comp.placeholder + (comp.hasAttribute('required')
             ? ''
             : ' (Optional)')
-          comp.span.innerText = `The field '${lowercaseName(comp.placeholder)}' is required.`
+          comp.span.innerText = `The field '${comp.placeholder}' is required.`
         },
         check: function(comp) {
           if(comp.autocomplete){
@@ -138,6 +157,9 @@
           }else{
             comp.input.setAttribute('autocomplete', 'new-password')
           }
+        },
+        replicates: function(comp) {
+          comp.original = document.querySelector(`password-input[placeholder='${comp.getAttribute('replicates')}']`)
         }
       }
       if((oldValue !== newValue)){
@@ -163,6 +185,7 @@
     }
     set value(value) {
       this.safeSetAttribute('value', value)
+      this.dispatchEvent(this.inputEvent)
     }
     get invalid() {
       return this.hasAttribute('invalid')
