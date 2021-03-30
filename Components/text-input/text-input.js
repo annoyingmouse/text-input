@@ -88,9 +88,15 @@
           hidden.style = 'width:0; height:0; border:none;'
           hidden.tabIndex = -1
           this.appendChild(hidden)
+          console.log(this.hiddenId)
           Object.defineProperty(hidden, 'value', {
-            get: () => comp.value,
-            set: value => {
+            get: function() {
+
+              return comp.value
+
+            },
+            set: function(value) {
+              this.updateValue(value)
               comp.value = value
             }
           })
@@ -116,7 +122,8 @@
       this.value = event.target.value
       if (event.target.value && this.hasAttribute('required')) {
         this.invalid = false
-        this.value = event.target.value
+        document.getElementById(this.hiddenId).value = event.target.value
+        //this.value = event.target.value
       }
     }
 
