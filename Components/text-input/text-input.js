@@ -74,12 +74,33 @@
       if (this.input.isConnected) {
         this.input.addEventListener('blur', this.blurListener)
         this.input.addEventListener('input', this.inputListener)
+        /**
+         * This is so we can get the data from the input for the form
+         */
+        if(this.hasAttribute('name')){
+          const comp = this
+          const name = this.getAttribute('name')
+          this.hiddenId = [...Array(8)].map(() => Math.random().toString(36)[2]).join('')
+          const hidden = document.createElement('input')
+          hidden.name = name
+          hidden.id = this.hiddenId
+          hidden.value = this.value
+          hidden.style = 'width:0; height:0; border:none;'
+          hidden.tabIndex = -1
+          this.appendChild(hidden)
+          Object.defineProperty(hidden, 'value', {
+            get: () => comp.value,
+            set: value => {
+              comp.value = value
+            }
+          })
+        }
       }
     }
 
     detachedCallback() {
-      this.input.removeEventListener("blur", this.blurListener);
-      this.input.removeEventListener("input", this.inputListener);
+      this.input.removeEventListener('blur', this.blurListener)
+      this.input.removeEventListener('input', this.inputListener)
     }
 
     blurListener = (event) => {
