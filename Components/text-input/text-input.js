@@ -70,21 +70,27 @@
     }
     connectedCallback() {
       if (this.input.isConnected) {
-        this.input.addEventListener('blur', event => {
-          if (!event.target.value && this.hasAttribute('required')) {
-            this.invalid = true
-          } else {
-            this.invalid = false
-            this.value = event.target.value
-          }
-        })
-        this.input.addEventListener('input', event => {
-          this.value = event.target.value
-          if (event.target.value && this.hasAttribute('required')) {
-            this.invalid = false
-            this.value = event.target.value
-          }
-        })
+        this.input.addEventListener('blur', this.blurListener)
+        this.input.addEventListener('input', this.inputListener)
+      }
+    }
+    detachedCallback() {
+      this.input.removeEventListener("blur", this.blurListener);
+      this.input.removeEventListener("input", this.inputListener);
+    }
+    blurListener = (event) => {
+      if (!event.target.value && this.hasAttribute('required')) {
+        this.invalid = true
+      } else {
+        this.invalid = false
+        this.value = event.target.value
+      }
+    }
+    inputListener = (event) => {
+      this.value = event.target.value
+      if (event.target.value && this.hasAttribute('required')) {
+        this.invalid = false
+        this.value = event.target.value
       }
     }
     attributeChangedCallback(name, oldValue, newValue) {
