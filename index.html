@@ -7,19 +7,33 @@
     <script src="Components/password-input/password-input.js"></script>
   </head>
   <body>
-    <form id="form">
+    <form id="form" onsubmit="return check(event)">
       <text-input placeholder="First name"
+                  name="fName"
                   autocomplete="given-name"
                   value="Dominic"></text-input>
       <text-input placeholder="Last name"
+                  name="lName"
                   autocomplete="family-name"
                   required></text-input>
       <password-input placeholder="New password"
+                      name="pWord1"
                       required
                       check></password-input>
       <password-input placeholder="Repeat new password"
+                      name="pWord2"
                       replicates="New password"
                       required></password-input>
+      <input type="submit" value="Submit">
     </form>
   </body>
+  <script>
+    const check = (e) => {
+      const form = new FormData(e.target)
+      for(const pair of form.entries()) {
+        console.log(pair[0]+ ', '+ pair[1]);
+      }
+      return false
+    }
+  </script>
 </html>
