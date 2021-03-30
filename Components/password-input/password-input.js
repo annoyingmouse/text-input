@@ -71,6 +71,7 @@
         'replicates'
       ]
     }
+
     constructor() {
       super()
       this.shadow = this.attachShadow({
@@ -86,54 +87,68 @@
         composed: true
       })
     }
+
     connectedCallback() {
       if (this.input.isConnected) {
+        this.input.addEventListener('blur', this.blurListener)
+        this.input.addEventListener('input', this.inputListener)
         if(this.original){
-          this.original.addEventListener('input', event => {
-            if(this.value && (this.value !== event.target.value)){
-              this.invalid = true
-              this.span.innerText = `The field '${this.placeholder}' does not match the '${this.original.getAttribute('placeholder')}' field.`
-            }else{
-              this.invalid = false
-            }
-          })
+          this.original.addEventListener('input', this.inputOriginalListener)
         }
-        this.input.addEventListener('blur', event => {
-          if (!event.target.value && this.hasAttribute('required')) {
-            this.invalid = true
-            this.span.innerText = `The field '${this.placeholder}' is required.`
-            this.removeAttribute('strength')
-          } else if(this.hasAttribute('replicates')) {
-            if(this.original.value !== event.target.value){
-              this.invalid = true
-              this.span.innerText = `The field '${this.placeholder}' does not match the '${this.original.getAttribute('placeholder')}' field.`
-            }else{
-              this.invalid = false
-            }
-          } else{
-            this.invalid = false
-          }
-        })
-        this.input.addEventListener('input', event => {
-          this.value = event.target.value
-          if (event.target.value && this.hasAttribute('required')) {
-            this.invalid = false
-          }
-          if(this.hasAttribute('check')) {
-            const result = zxcvbn(event.target.value)
-            this.strength = result.score
-            if(result.feedback.suggestions){
-              this.span.innerText = ''
-              generateFeedback(result).forEach(item => this.span.appendChild(item))
-            }
-          }else{
-            this.span.innerText = this.placeholder + (this.hasAttribute('required')
-              ? ''
-              : ' (Optional)')
-          }
-        })
       }
     }
+
+    detachedCallback() {
+      this.input.removeEventListener("blur", this.blurListener);
+      this.input.removeEventListener("input", this.inputListener);
+      this.original.removeEventListener('input', this.inputOriginalListener)
+    }
+
+    blurListener = (event) => {
+      if (!event.target.value && this.hasAttribute('required')) {
+        this.invalid = true
+        this.span.innerText = `The field '${this.placeholder}' is required.`
+        this.removeAttribute('strength')
+      } else if(this.hasAttribute('replicates')) {
+        if(this.original.value !== event.target.value){
+          this.invalid = true
+          this.span.innerText = `The field '${this.placeholder}' does not match the '${this.original.getAttribute('placeholder')}' field.`
+        }else{
+          this.invalid = false
+        }
+      } else{
+        this.invalid = false
+      }
+    }
+
+    inputListener = (event) => {
+      this.value = event.target.value
+      if (event.target.value && this.hasAttribute('required')) {
+        this.invalid = false
+      }
+      if(this.hasAttribute('check')) {
+        const result = zxcvbn(event.target.value)
+        this.strength = result.score
+        if(result.feedback.suggestions){
+          this.span.innerText = ''
+          generateFeedback(result).forEach(item => this.span.appendChild(item))
+        }
+      }else{
+        this.span.innerText = this.placeholder + (this.hasAttribute('required')
+          ? ''
+          : ' (Optional)')
+      }
+    }
+
+    inputOriginalListener = (event) => {
+      if(this.value && (this.value !== event.target.value)){
+        this.invalid = true
+        this.span.innerText = `The field '${this.placeholder}' does not match the '${this.original.getAttribute('placeholder')}' field.`
+      }else{
+        this.invalid = false
+      }
+    }
+
     attributeChangedCallback(name, oldValue, newValue) {
       const attributeHandler = {
         autocomplete: function(comp) {
@@ -166,20 +181,17 @@
         attributeHandler[name] && attributeHandler[name](this)
       }
     }
-    /**
-     * Guards against loops when reflecting observed attributes.
-     * @param  {String} name Attribute name
-     * @param  {any} value
-     * @protected
-     */
+
     safeSetAttribute(name, value) {
       if (this.getAttribute(name) !== value) {
         this.setAttribute(name, value)
       }
     }
+
     get placeholder(){
       return this.getAttribute('placeholder')
     }
+
     get value() {
       return this.getAttribute('value')
     }
@@ -187,6 +199,7 @@
       this.safeSetAttribute('value', value)
       this.dispatchEvent(this.inputEvent)
     }
+
     get invalid() {
       return this.hasAttribute('invalid')
     }
@@ -197,6 +210,7 @@
         this.removeAttribute('invalid')
       }
     }
+
     set strength(value) {
       this.safeSetAttribute('strength', value)
     }

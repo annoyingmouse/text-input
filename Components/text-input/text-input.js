@@ -58,6 +58,7 @@
         'autocomplete'
       ]
     }
+
     constructor() {
       super()
       this.shadow = this.attachShadow({
@@ -68,16 +69,19 @@
       this.input = this.shadow.querySelector('input')
       this.span = this.shadow.querySelector('span')
     }
+
     connectedCallback() {
       if (this.input.isConnected) {
         this.input.addEventListener('blur', this.blurListener)
         this.input.addEventListener('input', this.inputListener)
       }
     }
+
     detachedCallback() {
       this.input.removeEventListener("blur", this.blurListener);
       this.input.removeEventListener("input", this.inputListener);
     }
+
     blurListener = (event) => {
       if (!event.target.value && this.hasAttribute('required')) {
         this.invalid = true
@@ -86,6 +90,7 @@
         this.value = event.target.value
       }
     }
+
     inputListener = (event) => {
       this.value = event.target.value
       if (event.target.value && this.hasAttribute('required')) {
@@ -93,6 +98,7 @@
         this.value = event.target.value
       }
     }
+
     attributeChangedCallback(name, oldValue, newValue) {
       const attributeHandler = {
         autocomplete: function(comp) {
@@ -115,6 +121,7 @@
         attributeHandler[name] && attributeHandler[name](this)
       }
     }
+
     /**
      * Guards against loops when reflecting observed attributes.
      * @param  {String} name Attribute name
@@ -126,15 +133,18 @@
         this.setAttribute(name, value)
       }
     }
+
     get placeholder(){
       return this.getAttribute('placeholder')
     }
+
     get value() {
       return this.getAttribute('value')
     }
     set value(value) {
       this.safeSetAttribute('value', value)
     }
+
     get invalid() {
       return this.hasAttribute('invalid')
     }
