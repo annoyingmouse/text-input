@@ -24,6 +24,7 @@
    * https://stackoverflow.com/questions/7627000/javascript-convert-string-to-safe-class-name-for-css#7627141
    */
   const sanitiseName = value => value.replace(/[\s!"#$%&'()*+,./:;<=>?@[\\\]^`{|}~]/g, '').toLowerCase()
+  const randomString = length => [...Array(length)].map(() => Math.random().toString(36)[2]).join('')
 
   /**
    * @customElement input-text
@@ -74,34 +75,24 @@
       if (this.input.isConnected) {
         this.input.addEventListener('blur', this.blurListener)
         this.input.addEventListener('input', this.inputListener)
-        /**
-         * This is so we can get the data from the input for the form
-         */
         if(this.hasAttribute('name')){
-          const comp = this
-          const name = this.getAttribute('name')
-          this.hiddenId = [...Array(8)].map(() => Math.random().toString(36)[2]).join('')
-          const hidden = document.createElement('input')
-          hidden.name = name
-          hidden.id = this.hiddenId
-          hidden.value = this.value
-          hidden.style = 'width:0; height:0; border:none;'
-          hidden.tabIndex = -1
-          this.appendChild(hidden)
-          console.log(this.hiddenId)
-          Object.defineProperty(hidden, 'value', {
-            get: function() {
-
-              return comp.value
-
-            },
-            set: function(value) {
-              this.updateValue(value)
-              comp.value = value
-            }
-          })
+          this.ghost_id = `ghost_input_${randomString(8)}`
+          const ghost = this.createGhost(this.ghost_id)
+          this.appendChild(ghost)
+          this.ghost = document.getElementById(this.ghost_id)
         }
       }
+    }
+
+    createGhost(id) {
+      const input = document.createElement('input')
+      input.setAttribute('id', id)
+      input.setAttribute('name', this.getAttribute('name'))
+      input.setAttribute('tabindex', -1)
+      input.style.width = '0'
+      input.style.height = '0'
+      input.style.border = 'none'
+      return input
     }
 
     detachedCallback() {
@@ -122,8 +113,6 @@
       this.value = event.target.value
       if (event.target.value && this.hasAttribute('required')) {
         this.invalid = false
-        document.getElementById(this.hiddenId).value = event.target.value
-        //this.value = event.target.value
       }
     }
 
@@ -143,6 +132,11 @@
               ? ''
               : ' (Optional)')
           comp.span.innerText = `The field '${comp.placeholder}' is required.`
+        },
+        name: function(comp){
+          const ghost = document.querySelector(`#${this.hiddenId}`)
+          ghost.value = comp.getAttribute('value')
+          ghost.addEventListener('change', comp.ghostListener)
         }
       }
       if((oldValue !== newValue)){
@@ -171,6 +165,7 @@
     }
     set value(value) {
       this.safeSetAttribute('value', value)
+      this.ghost.value = value
     }
 
     get invalid() {
