@@ -1,5 +1,6 @@
 (() => {
   const template = document.createElement('template')
+  const ghost_template = document.createElement('template')
   const thisPath = document.currentScript.getAttribute('src')
   const compPath = thisPath.split('.').slice(0, -1).join('.')
   template.innerHTML = `
@@ -11,6 +12,10 @@
       <label></label>
       <span></span>
     </div>
+  `
+  ghost_template.innerHTML = `
+    <input tabindex="-1"
+           style="width: 0; height: 0; border: none;">
   `
 
   const rootPath = thisPath.split('/').slice(0, -1).join('/')
@@ -91,24 +96,14 @@
           this.original.addEventListener('input', this.inputOriginalListener)
         }
         if(this.hasAttribute('name')){
-          const comp = this
-          const name = this.getAttribute('name')
-          this.hiddenId = [...Array(8)].map(() => Math.random().toString(36)[2]).join('')
-          const hidden = document.createElement('input')
-          hidden.name = name
-          hidden.id = this.hiddenId
-          hidden.value = this.value
-          hidden.style = 'width:0; height:0; border:none;'
-          hidden.tabIndex = -1
-          this.appendChild(hidden)
-          Object.defineProperty(hidden, 'value', {
-            get: () => comp.value,
-            set: value => {
-              comp.value = value
-            }
-          })
+          this.appendChild(ghost_template.content.cloneNode(true))
+          this.ghost = this.querySelector('input')
+          this.ghost.id = this.getAttribute('name')
+          this.ghost.name = this.getAttribute('name')
+          this.ghost.value = this.value
         }
       }
+
     }
 
     detachedCallback() {
@@ -117,7 +112,7 @@
       this.original.removeEventListener('input', this.inputOriginalListener)
     }
 
-    blurListener = (event) => {
+    blurListener = event => {
       if (!event.target.value && this.hasAttribute('required')) {
         this.invalid = true
         this.span.innerText = `The field '${this.placeholder}' is required.`
@@ -134,7 +129,7 @@
       }
     }
 
-    inputListener = (event) => {
+    inputListener = event => {
       this.value = event.target.value
       if (event.target.value && this.hasAttribute('required')) {
         this.invalid = false
@@ -210,6 +205,7 @@
     }
     set value(value) {
       this.safeSetAttribute('value', value)
+      this.ghost.value = value
     }
 
     get invalid() {
