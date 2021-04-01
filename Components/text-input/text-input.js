@@ -76,17 +76,19 @@
       this.label = this.shadow.querySelector('label')
       this.input = this.shadow.querySelector('input')
       this.span = this.shadow.querySelector('span')
+
     }
 
     connectedCallback() {
       if (this.input.isConnected) {
+        this.name = this.getAttribute('name')
         this.input.addEventListener('blur', this.blurListener)
         this.input.addEventListener('input', this.inputListener)
         if(this.hasAttribute('name')){
           this.appendChild(ghost_template.content.cloneNode(true))
           this.ghost = this.querySelector('input')
-          this.ghost.id = this.getAttribute('name')
-          this.ghost.name = this.getAttribute('name')
+          this.ghost.id = this.name
+          this.ghost.name = this.name
           this.ghost.value = this.value
         }
       }
