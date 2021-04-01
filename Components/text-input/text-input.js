@@ -24,6 +24,48 @@
    * https://stackoverflow.com/questions/7627000/javascript-convert-string-to-safe-class-name-for-css#7627141
    */
   const sanitiseName = value => value.replace(/[\s!"#$%&'()*+,./:;<=>?@[\\\]^`{|}~]/g, '').toLowerCase()
+  const randomString = length => [...Array(length)].map(() => Math.random().toString(36)[2]).join('')
+
+  class Observable {
+    constructor(value) {
+      this._listeners = [];
+      this._value = value;
+    }
+    notify() {
+      this._listeners.forEach(listener => listener(this._value));
+    }
+    subscribe(listener) {
+      this._listeners.push(listener);
+    }
+    get value() {
+      return this._value;
+    }
+    set value(val) {
+      if (val !== this._value) {
+        this._value = val;
+        this.notify();
+      }
+    }
+  }
+
+  class Computed extends Observable {
+    constructor(value, deps) {
+      super(value());
+      const listener = () => {
+        this._value = value();
+        this.notify();
+      }
+      deps.forEach(dep => dep.subscribe(listener));
+    }
+
+    get value() {
+      return this._value;
+    }
+
+    set value(_) {
+      throw "Cannot set computed property";
+    }
+  }
 
   /**
    * @customElement input-text
@@ -77,12 +119,38 @@
       if (this.input.isConnected) {
         this.input.addEventListener('blur', this.blurListener)
         this.input.addEventListener('input', this.inputListener)
+        if(this.hasAttribute('name')){
+          this.ghost_id = `ghost_input_${randomString(8)}`
+          const ghost = this.createGhost(this.ghost_id)
+          this.appendChild(ghost)
+          this.ghost = document.getElementById(this.ghost_id)
+          const first = new Observable("Jeremy");
+          const firstInp = document.getElementById("first");
+          this.bindValue(this.input, this.ghost);
+        }
       }
     }
 
+    createGhost(id) {
+      const input = document.createElement('input')
+      input.setAttribute('id', id)
+      input.setAttribute('name', this.getAttribute('name'))
+      input.setAttribute('tabindex', -1)
+      input.style.width = '0'
+      input.style.height = '0'
+      input.style.border = 'none'
+      return input
+    }
+
+    bindValue = (input, observable) => {
+      input.value = observable.value;
+      observable.subscribe(() => input.value = observable.value);
+      input.onkeyup = () => observable.value = input.value;
+    }
+
     detachedCallback() {
-      this.input.removeEventListener("blur", this.blurListener);
-      this.input.removeEventListener("input", this.inputListener);
+      this.input.removeEventListener('blur', this.blurListener)
+      this.input.removeEventListener('input', this.inputListener)
     }
 
     blurListener = (event) => {
@@ -98,7 +166,6 @@
       this.value = event.target.value
       if (event.target.value && this.hasAttribute('required')) {
         this.invalid = false
-        this.value = event.target.value
       }
     }
 
@@ -118,6 +185,11 @@
               ? ''
               : ' (Optional)')
           comp.span.innerText = `The field '${comp.placeholder}' is required.`
+        },
+        name: function(comp){
+          const ghost = document.querySelector(`#${this.hiddenId}`)
+          ghost.value = comp.getAttribute('value')
+          ghost.addEventListener('change', comp.ghostListener)
         }
       }
       if((oldValue !== newValue)){
@@ -146,6 +218,7 @@
     }
     set value(value) {
       this.safeSetAttribute('value', value)
+      //this.ghost.value = value
     }
 
     get invalid() {

@@ -20,7 +20,7 @@
     script.setAttribute('type', 'text/javascript')
     script.setAttribute('async', 'true')
     const firstScript = document.getElementsByTagName('script')[0]
-    firstScript.parentNode.insertBefore(script, firstScript);
+    firstScript.parentNode.insertBefore(script, firstScript)
   }
 
   const generateFeedback = result => {
@@ -81,11 +81,6 @@
       this.label = this.shadow.querySelector('label')
       this.input = this.shadow.querySelector('input')
       this.span = this.shadow.querySelector('span')
-      this.inputEvent = new CustomEvent("input", {
-        bubbles: true,
-        cancelable: false,
-        composed: true
-      })
     }
 
     connectedCallback() {
@@ -95,12 +90,30 @@
         if(this.original){
           this.original.addEventListener('input', this.inputOriginalListener)
         }
+        if(this.hasAttribute('name')){
+          const comp = this
+          const name = this.getAttribute('name')
+          this.hiddenId = [...Array(8)].map(() => Math.random().toString(36)[2]).join('')
+          const hidden = document.createElement('input')
+          hidden.name = name
+          hidden.id = this.hiddenId
+          hidden.value = this.value
+          hidden.style = 'width:0; height:0; border:none;'
+          hidden.tabIndex = -1
+          this.appendChild(hidden)
+          Object.defineProperty(hidden, 'value', {
+            get: () => comp.value,
+            set: value => {
+              comp.value = value
+            }
+          })
+        }
       }
     }
 
     detachedCallback() {
-      this.input.removeEventListener("blur", this.blurListener);
-      this.input.removeEventListener("input", this.inputListener);
+      this.input.removeEventListener('blur', this.blurListener)
+      this.input.removeEventListener('input', this.inputListener)
       this.original.removeEventListener('input', this.inputOriginalListener)
     }
 
@@ -197,7 +210,6 @@
     }
     set value(value) {
       this.safeSetAttribute('value', value)
-      this.dispatchEvent(this.inputEvent)
     }
 
     get invalid() {
