@@ -50,6 +50,9 @@
    *             required></input-text>
    */
   class TextInput extends HTMLElement {
+
+    static formAssociated = true
+
     static get observedAttributes() {
       return [
         'value',
