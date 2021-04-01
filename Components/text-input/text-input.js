@@ -26,6 +26,47 @@
   const sanitiseName = value => value.replace(/[\s!"#$%&'()*+,./:;<=>?@[\\\]^`{|}~]/g, '').toLowerCase()
   const randomString = length => [...Array(length)].map(() => Math.random().toString(36)[2]).join('')
 
+  class Observable {
+    constructor(value) {
+      this._listeners = [];
+      this._value = value;
+    }
+    notify() {
+      this._listeners.forEach(listener => listener(this._value));
+    }
+    subscribe(listener) {
+      this._listeners.push(listener);
+    }
+    get value() {
+      return this._value;
+    }
+    set value(val) {
+      if (val !== this._value) {
+        this._value = val;
+        this.notify();
+      }
+    }
+  }
+
+  class Computed extends Observable {
+    constructor(value, deps) {
+      super(value());
+      const listener = () => {
+        this._value = value();
+        this.notify();
+      }
+      deps.forEach(dep => dep.subscribe(listener));
+    }
+
+    get value() {
+      return this._value;
+    }
+
+    set value(_) {
+      throw "Cannot set computed property";
+    }
+  }
+
   /**
    * @customElement input-text
    *
@@ -80,6 +121,9 @@
           const ghost = this.createGhost(this.ghost_id)
           this.appendChild(ghost)
           this.ghost = document.getElementById(this.ghost_id)
+          const first = new Observable("Jeremy");
+          const firstInp = document.getElementById("first");
+          this.bindValue(this.input, this.ghost);
         }
       }
     }
@@ -93,6 +137,12 @@
       input.style.height = '0'
       input.style.border = 'none'
       return input
+    }
+
+    bindValue = (input, observable) => {
+      input.value = observable.value;
+      observable.subscribe(() => input.value = observable.value);
+      input.onkeyup = () => observable.value = input.value;
     }
 
     detachedCallback() {
@@ -165,7 +215,7 @@
     }
     set value(value) {
       this.safeSetAttribute('value', value)
-      this.ghost.value = value
+      //this.ghost.value = value
     }
 
     get invalid() {
