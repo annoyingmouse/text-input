@@ -18,10 +18,9 @@ label {
   color: var(--Gray50);
   transition: all var(--s-fifth) ease-in;
   pointer-events: none;
-
-  &:hover {
-    cursor: auto;
-  }
+}
+label:hover {
+  cursor: auto;
 }
 
 input {
@@ -34,50 +33,37 @@ input {
   padding: var(--input-padding);
   line-height: var(--input-text-size);
   margin-bottom: var(--rem-three-quarters);
-
-  &::-webkit-input-placeholder {
-    color: transparent;
-  }
-
-  &::-moz-placeholder {
-    color: transparent;
-  }
-
-  &:-ms-input-placeholder {
-    color: transparent;
-  }
-
-  &:-moz-placeholder {
-    color: transparent;
-  }
-
-  &::placeholder {
-    color: transparent;
-  }
-
-  &:focus,
-  &:not(:placeholder-shown) {
-    + {
-      label {
-        top: calc(var(--rem-six-tenths) * -1);
-        left: var(--rem-eighth);
-        background-color: var(--white);
-        font-size: var(--rem-eigth-tenths);
-        padding: 0 var(--rem) 0 var(--rem-half);
-        border-radius: var(--rem);
-      }
-    }
-  }
-
-  &:focus {
-    outline: none;
-    box-shadow: 0 0 var(--rem-eighth) var(--rem-twentieth) rgba(0, 0, 0, 0.1);
-    border-color: var(--Gray75);
-  }
-
-  &:hover {
-    border-color: var(--Gray75);
-  }
+}
+input::-webkit-input-placeholder {
+  color: transparent;
+}
+input::-moz-placeholder {
+  color: transparent;
+}
+input:-ms-input-placeholder {
+  color: transparent;
+}
+input:-moz-placeholder {
+  color: transparent;
+}
+input::placeholder {
+  color: transparent;
+}
+input:focus + label, input:not(:placeholder-shown) + label {
+  top: calc(var(--rem-six-tenths) * -1);
+  left: var(--rem-eighth);
+  background-color: var(--white);
+  font-size: var(--rem-eigth-tenths);
+  padding: 0 var(--rem) 0 var(--rem-half);
+  border-radius: var(--rem);
+}
+input:focus {
+  outline: none;
+  box-shadow: 0 0 var(--rem-eighth) var(--rem-twentieth) rgba(0, 0, 0, 0.1);
+  border-color: var(--Gray75);
+}
+input:hover {
+  border-color: var(--Gray75);
 }
 
 :host {
@@ -103,49 +89,39 @@ input {
   --s-fifth: 0.2s;
   --op-nine-tenths: 0.9;
   --op-sixth-tenths: 0.6;
-
   /* Change these */
   --input-text-size: var(--rem-and-a-half);
   --input-padding: var(--rem-eigth-tenths);
   --input-border: var(--rem-twentieth);
   --input-height: calc(var(--input-text-size) + calc(var(--input-border) + calc(var(--input-padding) * 2)));
-
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji, cursive;
   outline: unset;
-
-  span {
-    display: none;
-    border: none;
-  }
+}
+:host span {
+  display: none;
+  border: none;
 }
 
-:host([invalid]) {
-  label {
-    color: var(--TorchRed);
-    opacity: 1;
-  }
-
-  input {
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
-    border-color: var(--TorchRed);
-  }
-
-  span {
-    display: unset;
-    border: unset;
-  }
+:host([invalid]) label {
+  color: var(--TorchRed);
+  opacity: 1;
+}
+:host([invalid]) input {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  border-color: var(--TorchRed);
+}
+:host([invalid]) span {
+  display: unset;
+  border: unset;
 }
 
-:host([disabled]) {
-  input {
-    cursor: not-allowed;
-    background-color: var(--Gray90);
-
-    &:hover {
-      border-color: var(--Gray90);
-    }
-  }
+:host([disabled]) input {
+  cursor: not-allowed;
+  background-color: var(--Gray90);
+}
+:host([disabled]) input:hover {
+  border-color: var(--Gray90);
 }
 
 div {
@@ -153,3 +129,5 @@ div {
   margin-top: var(--rem);
   margin-bottom: var(--rem-and-a-half);
 }
+
+/*# sourceMappingURL=wc-text-input.css.map */

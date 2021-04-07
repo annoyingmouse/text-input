@@ -5,26 +5,39 @@
     <title>Text Input Web Component</title>
     <script src="Components/text-input/text-input.js"></script>
     <script src="Components/password-input/password-input.js"></script>
+    <script src="Components/wc-text-input/wc-text-input.js" defer></script>
   </head>
   <body>
     <form id="form" onsubmit="return check(event)">
-      <text-input placeholder="First name"
-                  name="fName"
-                  autocomplete="given-name"
-                  value="Dominic"></text-input>
-      <text-input placeholder="Last name"
-                  name="lName"
-                  autocomplete="family-name"
-                  required></text-input>
-      <password-input placeholder="New password"
-                      name="pWord1"
-                      required
-                      check></password-input>
-      <password-input placeholder="Repeat new password"
-                      name="pWord2"
-                      replicates="New password"
-                      required></password-input>
+
+      <wc-text-input placeholder="First name"
+                     name="firstName"
+                     autocomplete="given-name"></wc-text-input>
+
+      <wc-text-input placeholder="Surname"
+                     name="lastName"
+                     required
+                     autocomplete="family -name"></wc-text-input>
+
+<!--      <text-input placeholder="First name"-->
+<!--                  name="fName"-->
+<!--                  disabled-->
+<!--                  autocomplete="given-name"-->
+<!--                  value="Dominic"></text-input>-->
+<!--      <text-input placeholder="Last name"-->
+<!--                  name="lName"-->
+<!--                  autocomplete="family-name"-->
+<!--                  required></text-input>-->
+<!--      <password-input placeholder="New password"-->
+<!--                      name="pWord1"-->
+<!--                      required-->
+<!--                      check></password-input>-->
+<!--      <password-input placeholder="Repeat new password"-->
+<!--                      name="pWord2"-->
+<!--                      replicates="New password"-->
+<!--                      required></password-input>-->
       <input type="submit" value="Submit">
+      <input type="reset" value="Reset">
     </form>
   </body>
   <script>
